@@ -38,6 +38,12 @@ func NewServer(db *sql.DB) *Server {
 	router.Put("/users/{id}", s.UpdateUser)
 	router.Delete("/users/{id}", s.DeleteUser)
 
+	router.Get("/users/read", s.GetReadBooks)
+	router.Get("/users/read/{id}", s.GetReadBook)
+	router.Post("/users/read", s.CreateReadBook)
+	router.Put("/users/read/{id}", s.UpdateReadBook)
+	router.Delete("/users/read/{id}", s.DeleteReadBook)
+
 	return s
 
 }

@@ -16,6 +16,9 @@ CREATE TABLE read_books (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     book_id INT NOT NULL,
+    read_date DATE,
+    rating INT,
+    review TEXT,
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (book_id) REFERENCES books (id)
 );
