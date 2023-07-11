@@ -8,9 +8,9 @@ import (
 )
 
 type Server struct {
-	db     *sql.DB
+	Db     *sql.DB
 	Router chi.Router
-	cache  *cache.Cache
+	Cache  *cache.Cache
 }
 
 func NewServer(db *sql.DB) *Server {
@@ -19,9 +19,9 @@ func NewServer(db *sql.DB) *Server {
 	cache := cache.New(cache.NoExpiration, cache.NoExpiration)
 
 	s := &Server{
-		db:     db,
+		Db:     db,
 		Router: router,
-		cache:  cache,
+		Cache:  cache,
 	}
 
 	router.Get("/books", s.GetBooks)

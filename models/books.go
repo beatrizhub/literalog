@@ -28,7 +28,7 @@ func (s *Server) CreateBook(w http.ResponseWriter, r *http.Request) {
 
 	query := "INSERT INTO books (title, author, genre) VALUES ($1, $2, $3) RETURNING id"
 
-	err = s.db.QueryRow(query, book.Title, book.Author, pq.Array(book.Genre)).Scan(&book.ID)
+	err = s.Db.QueryRow(query, book.Title, book.Author, pq.Array(book.Genre)).Scan(&book.ID)
 	if err != nil {
 		http.Error(w, "Failed inserting book in database", http.StatusInternalServerError)
 		return
@@ -51,7 +51,7 @@ func (s *Server) UpdateBook(w http.ResponseWriter, r *http.Request) {
 
 	query := "UPDATE books SET title = $1, author = $2, genre = $3 WHERE id = $4"
 
-	_, err = s.db.Exec(query, book.Title, book.Author, pq.Array(book.Genre), bookID)
+	_, err = s.Db.Exec(query, book.Title, book.Author, pq.Array(book.Genre), bookID)
 	if err != nil {
 		http.Error(w, "Failed updating book in database", http.StatusInternalServerError)
 		return
@@ -67,7 +67,7 @@ func (s *Server) DeleteBook(w http.ResponseWriter, r *http.Request) {
 
 	query := "DELETE FROM books WHERE id = $1"
 
-	_, err := s.db.Exec(query, bookID)
+	_, err := s.Db.Exec(query, bookID)
 	if err != nil {
 		http.Error(w, "Failed deleting book in database", http.StatusInternalServerError)
 		return
@@ -83,7 +83,7 @@ func (s *Server) GetBooks(w http.ResponseWriter, r *http.Request) {
 
 	query := "SELECT * FROM books"
 
-	rows, err := s.db.Query(query)
+	rows, err := s.Db.Query(query)
 	if err != nil {
 		http.Error(w, "Failed querying database", http.StatusInternalServerError)
 		return
@@ -110,7 +110,7 @@ func (s *Server) GetBook(w http.ResponseWriter, r *http.Request) {
 	var book Book
 	query := "SELECT * FROM books WHERE id = $1"
 
-	err := s.db.QueryRow(query, bookID).Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
+	err := s.Db.QueryRow(query, bookID).Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -124,7 +124,7 @@ func (s *Server) GetBooksByGenre(w http.ResponseWriter, r *http.Request) {
 
 	genre := chi.URLParam(r, "genre")
 
-	if cachedBooks, found := s.cache.Get("books-" + genre); found {
+	if cachedBooks, found := s.Cache.Get("books-" + genre); found {
 		json.NewEncoder(w).Encode(cachedBooks)
 		log.Println("Cached")
 		return
@@ -132,7 +132,7 @@ func (s *Server) GetBooksByGenre(w http.ResponseWriter, r *http.Request) {
 
 	query := "SELECT * FROM books WHERE $1 = ANY(genre)"
 
-	rows, err := s.db.Query(query, genre)
+	rows, err := s.Db.Query(query, genre)
 	if err != nil {
 		http.Error(w, "Failed querying database", http.StatusInternalServerError)
 		return
@@ -150,7 +150,7 @@ func (s *Server) GetBooksByGenre(w http.ResponseWriter, r *http.Request) {
 		books = append(books, book)
 	}
 
-	s.cache.Set("books-"+genre, books, time.Minute*5)
+	s.Cache.Set("books-"+genre, books, time.Minute*5)
 	json.NewEncoder(w).Encode(books)
 }
 
@@ -158,7 +158,7 @@ func (s *Server) GetBooksByAuthor(w http.ResponseWriter, r *http.Request) {
 
 	author := chi.URLParam(r, "author")
 
-	if cachedBooks, found := s.cache.Get("books-" + author); found {
+	if cachedBooks, found := s.Cache.Get("books-" + author); found {
 		json.NewEncoder(w).Encode(cachedBooks)
 		log.Println("Cached")
 		return
@@ -166,7 +166,7 @@ func (s *Server) GetBooksByAuthor(w http.ResponseWriter, r *http.Request) {
 
 	query := "SELECT * FROM books WHERE author = $1"
 
-	rows, err := s.db.Query(query, author)
+	rows, err := s.Db.Query(query, author)
 	if err != nil {
 		http.Error(w, "Failed querying database", http.StatusInternalServerError)
 		return
@@ -184,7 +184,7 @@ func (s *Server) GetBooksByAuthor(w http.ResponseWriter, r *http.Request) {
 		books = append(books, book)
 	}
 
-	s.cache.Set("books-"+author, books, time.Minute*5)
+	s.Cache.Set("books-"+author, books, time.Minute*5)
 	json.NewEncoder(w).Encode(books)
 }
 

@@ -27,12 +27,12 @@ func (s *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if isUsernameTaken(s.db, user.Username, 0) {
+	if isUsernameTaken(s.Db, user.Username, 0) {
 		http.Error(w, "Username already taken", http.StatusBadRequest)
 		return
 	}
 
-	if isEmailTaken(s.db, user.Email, 0) {
+	if isEmailTaken(s.Db, user.Email, 0) {
 		http.Error(w, "Email already taken", http.StatusBadRequest)
 		return
 	}
@@ -43,7 +43,7 @@ func (s *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	query := "INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id"
-	err = s.db.QueryRow(query, user.Username, user.Password, user.Email).Scan(&user.ID)
+	err = s.Db.QueryRow(query, user.Username, user.Password, user.Email).Scan(&user.ID)
 	if err != nil {
 		http.Error(w, "Failed inserting user in database", http.StatusInternalServerError)
 		return
@@ -108,12 +108,12 @@ func (s *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if isUsernameTaken(s.db, user.Username, user.ID) {
+	if isUsernameTaken(s.Db, user.Username, user.ID) {
 		http.Error(w, "Username already taken", http.StatusBadRequest)
 		return
 	}
 
-	if isEmailTaken(s.db, user.Email, user.ID) {
+	if isEmailTaken(s.Db, user.Email, user.ID) {
 		http.Error(w, "Email already taken", http.StatusBadRequest)
 		return
 	}
@@ -125,7 +125,7 @@ func (s *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	query := "UPDATE users SET username = $1, password = $2, email = $3 WHERE id = $4"
 
-	_, err = s.db.Exec(query, user.Username, user.Password, user.Email, userID)
+	_, err = s.Db.Exec(query, user.Username, user.Password, user.Email, userID)
 	if err != nil {
 		http.Error(w, "Failed updating user in database", http.StatusInternalServerError)
 		return
@@ -141,7 +141,7 @@ func (s *Server) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	query := "DELETE FROM users WHERE id = $1"
 
-	_, err := s.db.Exec(query, userID)
+	_, err := s.Db.Exec(query, userID)
 	if err != nil {
 		http.Error(w, "Failed deleting user in database", http.StatusInternalServerError)
 		return
@@ -159,7 +159,7 @@ func (s *Server) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	query := "SELECT * FROM users WHERE id = $1"
 
-	err := s.db.QueryRow(query, userID).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
+	err := s.Db.QueryRow(query, userID).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
 	if err != nil {
 		http.Error(w, "Failed getting user in database", http.StatusInternalServerError)
 		return
@@ -175,7 +175,7 @@ func (s *Server) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	query := "SELECT * FROM users"
 
-	rows, err := s.db.Query(query)
+	rows, err := s.Db.Query(query)
 	if err != nil {
 		http.Error(w, "Failed getting users in database", http.StatusInternalServerError)
 		return
@@ -203,7 +203,7 @@ func (s *Server) GetUserByUsername(w http.ResponseWriter, r *http.Request) {
 
 	query := "SELECT * FROM users WHERE username = $1"
 
-	err := s.db.QueryRow(query, username).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
+	err := s.Db.QueryRow(query, username).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
 	if err != nil {
 		http.Error(w, "Failed getting user in database", http.StatusInternalServerError)
 		return
@@ -221,7 +221,7 @@ func (s *Server) GetUserByEmail(w http.ResponseWriter, r *http.Request) {
 
 	query := "SELECT * FROM users WHERE email = $1"
 
-	err := s.db.QueryRow(query, email).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
+	err := s.Db.QueryRow(query, email).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
 	if err != nil {
 		http.Error(w, "Failed getting user in database", http.StatusInternalServerError)
 		return
@@ -241,7 +241,7 @@ func (s *Server) GetUserByUsernameOrEmailAndPassword(w http.ResponseWriter, r *h
 
 	query := "SELECT * FROM users WHERE (username = $1 OR email = $2) AND password = $3"
 
-	err := s.db.QueryRow(query, username, email, password).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
+	err := s.Db.QueryRow(query, username, email, password).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
 	if err != nil {
 		http.Error(w, "Failed getting user in database", http.StatusInternalServerError)
 		return
