@@ -1,0 +1,17 @@
+version: '3'
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: books
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: 5432
+    ports:
+      - '5432:5432'
+    volumes: 
+      - $PWD/volumes/pg:/var/lib/postgresql
+volumes:
+  db:
+    driver: local
