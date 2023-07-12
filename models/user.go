@@ -158,7 +158,6 @@ func (s *Server) GetUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 
 	query := "SELECT * FROM users WHERE id = $1"
-
 	err := s.Db.QueryRow(query, userID).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
 	if err != nil {
 		http.Error(w, "Failed getting user in database", http.StatusInternalServerError)
