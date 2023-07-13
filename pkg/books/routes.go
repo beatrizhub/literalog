@@ -24,20 +24,20 @@ func (s *Server) Routes() chi.Router {
 
 	r := chi.NewRouter()
 
-	r.Get("/books", s.GetBooksRoute)
-	r.Get("/books/{id}", s.GetBookByIDRoute)
-	r.Get("/books/genre/{genre}", s.GetBooksByGenreRoute)
-	r.Get("/books/author/{author}", s.GetBooksByAuthorRoute)
-	r.Post("/books", s.CreateBookRoute)
-	r.Put("/books/{id}", s.UpdateBookRoute)
-	r.Delete("/books/{id}", s.DeleteBookRoute)
+	r.Get("/", s.GetBooksRoute)
+	r.Get("/{id}", s.GetBookByIDRoute)
+	r.Get("/genre/{genre}", s.GetBooksByGenreRoute)
+	r.Get("/author/{author}", s.GetBooksByAuthorRoute)
+	r.Post("/", s.CreateBookRoute)
+	r.Put("/{id}", s.UpdateBookRoute)
+	r.Delete("/{id}", s.DeleteBookRoute)
 
-	r.Get("/users/read", s.GetReadBooksRoute)
-	r.Get("/users/read/{id}", s.GetReadBookByIDRoute)
-	r.Get("/users/{userID}/read/{bookID}", s.GetReadBooksByUserRoute)
-	r.Post("/users/read", s.CreateReadBookRoute)
-	r.Put("/users/read/{id}", s.UpdateReadBookRoute)
-	r.Delete("/users/read/{id}", s.DeleteReadBookRoute)
+	r.Get("/read", s.GetReadBooksRoute)
+	r.Get("/read/{id}", s.GetReadBookByIDRoute)
+	r.Get("/read/user/{userId}", s.GetReadBooksByUserRoute)
+	r.Post("/read", s.CreateReadBookRoute)
+	r.Put("/read/{id}", s.UpdateReadBookRoute)
+	r.Delete("/read/{id}", s.DeleteReadBookRoute)
 
 	return r
 
@@ -254,15 +254,15 @@ func (s *Server) GetBooksByGenreRoute(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) GetReadBooksByUserRoute(w http.ResponseWriter, r *http.Request) {
 
-	userID := chi.URLParam(r, "userID")
+	userId := chi.URLParam(r, "userId")
 
-	userIDint, err := strconv.Atoi(userID)
+	userIdInt, err := strconv.Atoi(userId)
 	if err != nil {
 		http.Error(w, "Failed converting userID to int", http.StatusInternalServerError)
 		return
 	}
 
-	readBooks, err := s.Service.GetReadBooksByUser(userIDint)
+	readBooks, err := s.Service.GetReadBooksByUser(userIdInt)
 	if err != nil {
 		http.Error(w, "Failed getting read books from database", http.StatusInternalServerError)
 		return

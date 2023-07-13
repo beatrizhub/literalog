@@ -33,7 +33,7 @@ func (s *Service) CreateBook(book Book) (Book, error) {
 
 	query := "INSERT INTO books (title, author, genre) VALUES ($1, $2, $3) RETURNING id"
 
-	err := s.Db.QueryRow(query, book.Title, book.Author, pq.Array(book.Genre)).Scan(&book.ID)
+	_, err := s.Db.Exec(query, book.Title, book.Author, pq.Array(book.Genre))
 	if err != nil {
 		return Book{}, err
 	}
@@ -46,7 +46,7 @@ func (s *Service) CreateReadBook(readBook ReadBook) (ReadBook, error) {
 
 	query := "INSERT INTO read_books (user_id, book_id, read_date, rating, review) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 
-	err := s.Db.QueryRow(query, readBook.UserID, readBook.BookID, readBook.ReadDate, readBook.Rating, readBook.Review).Scan(&readBook.ID)
+	_, err := s.Db.Exec(query, readBook.UserID, readBook.BookID, readBook.ReadDate, readBook.Rating, readBook.Review)
 	if err != nil {
 		return ReadBook{}, err
 	}
@@ -72,7 +72,7 @@ func (s *Service) UpdateReadBook(id int, readBook ReadBook) error {
 
 	query := "UPDATE read_books SET user_id = $1, book_id = $2, read_date = $3, rating = $4, review = $5 WHERE id = $6"
 
-	err := s.Db.QueryRow(query, readBook.UserID, readBook.BookID, readBook.ReadDate, readBook.Rating, readBook.Review, id).Scan(&readBook.ID)
+	_, err := s.Db.Exec(query, readBook.UserID, readBook.BookID, readBook.ReadDate, readBook.Rating, readBook.Review, id)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -99,7 +99,7 @@ func (s *Service) DeleteReadBook(id int) error {
 
 	query := "DELETE FROM read_books WHERE id = $1"
 
-	err := s.Db.QueryRow(query, id).Scan(&id)
+	_, err := s.Db.Exec(query, id)
 	if err != nil {
 		return err
 	}

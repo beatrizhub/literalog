@@ -1,7 +1,7 @@
 package main
 
 import (
-	"books/models"
+	"books/pkg/server"
 	"database/sql"
 	"net/http"
 
@@ -21,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	server := models.NewServer(db)
+	server := server.NewServer(db)
 
 	http.ListenAndServe(":8080", server.Router)
 

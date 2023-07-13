@@ -1,7 +1,8 @@
-package models
+package server
 
 import (
-	"books/books"
+	"books/pkg/books"
+	"books/pkg/user"
 	"database/sql"
 
 	"github.com/go-chi/chi"
@@ -13,30 +14,30 @@ type Server struct {
 	Router     chi.Router
 	Cache      *cache.Cache
 	BookServer *books.Server
+	UserServer *user.Server
 }
 
 func NewServer(db *sql.DB) *Server {
 
-	router := chi.NewRouter()
+	r := chi.NewRouter()
 	cache := cache.New(cache.NoExpiration, cache.NoExpiration)
 
 	bookService := books.NewService(db)
 	bookServer := books.NewServer(bookService)
 
+	userService := user.NewService(db)
+	userServer := user.NewServer(userService)
+
 	s := &Server{
 		Db:         db,
-		Router:     router,
+		Router:     r,
 		Cache:      cache,
 		BookServer: bookServer,
+		UserServer: userServer,
 	}
 
-	router.Mount("/", bookServer.Routes())
-
-	router.Get("/users", s.GetUsers)
-	router.Get("/users/{id}", s.GetUser)
-	router.Post("/users", s.CreateUser)
-	router.Put("/users/{id}", s.UpdateUser)
-	router.Delete("/users/{id}", s.DeleteUser)
+	r.Mount("/books", bookServer.Routes())
+	r.Mount("/users", userServer.Routes())
 
 	return s
 
