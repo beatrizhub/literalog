@@ -3,7 +3,6 @@ package books
 import (
 	"database/sql"
 	"fmt"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -287,6 +286,32 @@ func (s *Service) GetReadBooksByUser(id int) ([]ReadBook, error) {
 
 }
 
-func GetBooksRecommendation(w http.ResponseWriter, r *http.Request) {
+func (s *Service) GetBooksByTitle(title string) ([]Book, error) {
+
+	if cachedBooks, found := s.Cache.Get("books-title-" + title); found {
+		return cachedBooks.([]Book), nil
+	}
+
+	query := "SELECT * FROM books WHERE title = $1"
+
+	rows, err := s.Db.Query(query, title)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var books []Book
+	for rows.Next() {
+		var book Book
+		err := rows.Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
+		if err != nil {
+			return nil, err
+		}
+		books = append(books, book)
+	}
+
+	s.Cache.Set("books-title-"+title, books, time.Minute*5)
+
+	return books, nil
 
 }
