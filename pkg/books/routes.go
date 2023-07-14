@@ -40,6 +40,11 @@ func (s *Server) Routes() chi.Router {
 	r.Put("/read/{id}", s.UpdateReadBookRoute)
 	r.Delete("/read/{id}", s.DeleteReadBookRoute)
 
+	r.Get("/toberead", s.GetToBeReadBooksRoute)
+	r.Get("/toberead/user/{userId}", s.GetToBeReadBooksByUserIDRoute)
+	r.Post("/toberead", s.CreateToBeReadBookRoute)
+	r.Delete("/toberead/{id}", s.DeleteToBeReadBookRoute)
+
 	return r
 
 }
@@ -78,6 +83,26 @@ func (s *Server) CreateReadBookRoute(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(readBook)
+
+}
+
+func (s *Server) CreateToBeReadBookRoute(w http.ResponseWriter, r *http.Request) {
+
+	var toBeReadBook ToBeReadBook
+
+	err := json.NewDecoder(r.Body).Decode(&toBeReadBook)
+	if err != nil {
+		http.Error(w, "Failed decoding", http.StatusBadRequest)
+		return
+	}
+
+	toBeReadBook, err = s.Service.CreateToBeReadBook(toBeReadBook)
+	if err != nil {
+		http.Error(w, "Failed inserting to be read book in database", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(toBeReadBook)
 
 }
 
@@ -176,6 +201,26 @@ func (s *Server) DeleteReadBookRoute(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func (s *Server) DeleteToBeReadBookRoute(w http.ResponseWriter, r *http.Request) {
+
+	toBeReadBookID := chi.URLParam(r, "id")
+
+	toBeReadBookIDint, err := strconv.Atoi(toBeReadBookID)
+	if err != nil {
+		http.Error(w, "Failed converting toBeReadBookID to int", http.StatusInternalServerError)
+		return
+	}
+
+	err = s.Service.DeleteToBeReadBook(toBeReadBookIDint)
+	if err != nil {
+		http.Error(w, "Failed deleting to be read book in database", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+}
+
 func (s *Server) GetBooksRoute(w http.ResponseWriter, r *http.Request) {
 
 	books, err := s.Service.GetBooks()
@@ -197,6 +242,18 @@ func (s *Server) GetReadBooksRoute(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(readBooks)
+
+}
+
+func (s *Server) GetToBeReadBooksRoute(w http.ResponseWriter, r *http.Request) {
+
+	toBeReadBooks, err := s.Service.GetToBeReadBooks()
+	if err != nil {
+		http.Error(w, "Failed getting to be read books from database", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(toBeReadBooks)
 
 }
 
@@ -270,6 +327,26 @@ func (s *Server) GetReadBooksByUserRoute(w http.ResponseWriter, r *http.Request)
 	}
 
 	json.NewEncoder(w).Encode(readBooks)
+
+}
+
+func (s *Server) GetToBeReadBooksByUserIDRoute(w http.ResponseWriter, r *http.Request) {
+
+	userId := chi.URLParam(r, "userId")
+
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		http.Error(w, "Failed converting userID to int", http.StatusInternalServerError)
+		return
+	}
+
+	toBeReadBooks, err := s.Service.GetToBeReadBooksByUserID(userIdInt)
+	if err != nil {
+		http.Error(w, "Failed getting to be read books from database", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(toBeReadBooks)
 
 }
 

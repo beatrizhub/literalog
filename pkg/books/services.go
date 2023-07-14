@@ -54,6 +54,19 @@ func (s *Service) CreateReadBook(readBook ReadBook) (ReadBook, error) {
 
 }
 
+func (s *Service) CreateToBeReadBook(toBeReadBook ToBeReadBook) (ToBeReadBook, error) {
+
+	query := "INSERT INTO to_be_read_books (user_id, book_id) VALUES ($1, $2) RETURNING id"
+
+	_, err := s.Db.Exec(query, toBeReadBook.UserID, toBeReadBook.BookID)
+	if err != nil {
+		return ToBeReadBook{}, err
+	}
+
+	return toBeReadBook, nil
+
+}
+
 func (s *Service) UpdateBook(id int, book Book) error {
 
 	query := "UPDATE books SET title = $1, author = $2, genre = $3 WHERE id = $4"
@@ -97,6 +110,19 @@ func (s *Service) DeleteBook(id int) error {
 func (s *Service) DeleteReadBook(id int) error {
 
 	query := "DELETE FROM read_books WHERE id = $1"
+
+	_, err := s.Db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (s *Service) DeleteToBeReadBook(id int) error {
+
+	query := "DELETE FROM to_be_read_books WHERE id = $1"
 
 	_, err := s.Db.Exec(query, id)
 	if err != nil {
@@ -152,6 +178,30 @@ func (s *Service) GetReadBooks() ([]ReadBook, error) {
 	}
 
 	return readBooks, nil
+
+}
+
+func (s *Service) GetToBeReadBooks() ([]ToBeReadBook, error) {
+
+	toBeReadBooks := make([]ToBeReadBook, 0)
+
+	query := "SELECT * FROM to_be_read_books"
+
+	rows, err := s.Db.Query(query)
+	if err != nil {
+		return toBeReadBooks, err
+	}
+
+	for rows.Next() {
+		var toBeReadBook ToBeReadBook
+		err := rows.Scan(&toBeReadBook.ID, &toBeReadBook.UserID, &toBeReadBook.BookID)
+		if err != nil {
+			return toBeReadBooks, err
+		}
+		toBeReadBooks = append(toBeReadBooks, toBeReadBook)
+	}
+
+	return toBeReadBooks, nil
 
 }
 
@@ -283,6 +333,36 @@ func (s *Service) GetReadBooksByUser(id int) ([]ReadBook, error) {
 	s.Cache.Set("read-books-user-id-"+strconv.Itoa(id), readBooks, time.Minute*5)
 
 	return readBooks, nil
+
+}
+
+func (s *Service) GetToBeReadBooksByUserID(id int) ([]ToBeReadBook, error) {
+
+	if cachedToBeReadBooks, found := s.Cache.Get("to-be-read-books-user-id-" + strconv.Itoa(id)); found {
+		return cachedToBeReadBooks.([]ToBeReadBook), nil
+	}
+
+	query := "SELECT * FROM to_be_read_books WHERE user_id = $1"
+
+	rows, err := s.Db.Query(query, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var toBeReadBooks []ToBeReadBook
+	for rows.Next() {
+		var toBeReadBook ToBeReadBook
+		err := rows.Scan(&toBeReadBook.ID, &toBeReadBook.UserID, &toBeReadBook.BookID)
+		if err != nil {
+			return nil, err
+		}
+		toBeReadBooks = append(toBeReadBooks, toBeReadBook)
+	}
+
+	s.Cache.Set("to-be-read-books-user-id-"+strconv.Itoa(id), toBeReadBooks, time.Minute*5)
+
+	return toBeReadBooks, nil
 
 }
 
