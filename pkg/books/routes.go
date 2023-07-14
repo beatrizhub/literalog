@@ -29,6 +29,7 @@ func (s *Server) Routes() chi.Router {
 	r.Get("/genre/{genre}", s.GetBooksByGenreRoute)
 	r.Get("/author/{author}", s.GetBooksByAuthorRoute)
 	r.Get("/title/{title}", s.GetBooksByTitleRoute)
+	r.Get("/recommendations/{userId}", s.GetBooksRecommendationsRoute)
 	r.Post("/", s.CreateBookRoute)
 	r.Put("/{id}", s.UpdateBookRoute)
 	r.Delete("/{id}", s.DeleteBookRoute)
@@ -369,6 +370,26 @@ func (s *Server) GetBooksByTitleRoute(w http.ResponseWriter, r *http.Request) {
 	title := chi.URLParam(r, "title")
 
 	books, err := s.Service.GetBooksByTitle(title)
+	if err != nil {
+		http.Error(w, "Failed getting book from database", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(books)
+
+}
+
+func (s *Server) GetBooksRecommendationsRoute(w http.ResponseWriter, r *http.Request) {
+
+	userId := chi.URLParam(r, "userId")
+
+	userIdInt, err := strconv.Atoi(userId)
+	if err != nil {
+		http.Error(w, "Failed converting userID to int", http.StatusInternalServerError)
+		return
+	}
+
+	books, err := s.Service.GetBooksRecommendations(userIdInt)
 	if err != nil {
 		http.Error(w, "Failed getting book from database", http.StatusInternalServerError)
 		return

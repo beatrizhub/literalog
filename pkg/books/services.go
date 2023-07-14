@@ -395,3 +395,43 @@ func (s *Service) GetBooksByTitle(title string) ([]Book, error) {
 	return books, nil
 
 }
+
+func (s *Service) GetBooksRecommendations(userId int) ([]Book, error) {
+
+	readBooks, err := s.GetReadBooksByUser(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	var genres []string
+	var authors []string
+
+	for _, readBook := range readBooks {
+		book, err := s.GetBookByID(readBook.BookID)
+		if err != nil {
+			return nil, err
+		}
+		genres = append(genres, book.Genre...)
+		authors = append(authors, book.Author)
+	}
+
+	query := "SELECT * FROM books WHERE genre && $1 OR author = ANY($2)"
+
+	rows, err := s.Db.Query(query, pq.Array(genres), pq.Array(authors))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var books []Book
+	for rows.Next() {
+		var book Book
+		err := rows.Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
+		if err != nil {
+			return nil, err
+		}
+		books = append(books, book)
+	}
+
+	return books, nil
+}
