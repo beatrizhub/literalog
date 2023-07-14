@@ -107,7 +107,7 @@ func (s *Service) GetUserByID(id int) (User, error) {
 	query := "SELECT * FROM users WHERE id = $1"
 
 	var user User
-	err := s.Db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Email)
+	err := s.Db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
 	if err != nil {
 		return User{}, err
 	}
@@ -121,7 +121,7 @@ func (s *Service) GetUserByUsername(username string) (User, error) {
 	query := "SELECT * FROM users WHERE username = $1"
 
 	var user User
-	err := s.Db.QueryRow(query, username).Scan(&user.ID, &user.Username, &user.Email)
+	err := s.Db.QueryRow(query, username).Scan(&user.ID, &user.Username, &user.Password, &user.Email)
 	if err != nil {
 		return User{}, err
 	}

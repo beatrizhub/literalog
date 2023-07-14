@@ -26,6 +26,7 @@ func (s *Server) Routes() chi.Router {
 
 	r.Get("/", s.GetUsersRoute)
 	r.Get("/{id}", s.GetUserByIDRoute)
+	r.Get("/username/{username}", s.GetUserByUsernameRoute)
 	r.Post("/", s.CreateUserRoute)
 	r.Post("/bulk", s.CreateUsersRoute)
 	r.Put("/{id}", s.UpdateUserRoute)
@@ -205,6 +206,24 @@ func (s *Server) GetUserByIDRoute(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := s.Service.GetUserByID(userIdInt)
+	if err != nil {
+		http.Error(w, "Failed getting user from database", http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(user)
+
+}
+
+func (s *Server) GetUserByUsernameRoute(w http.ResponseWriter, r *http.Request) {
+
+	username := chi.URLParam(r, "username")
+	if username == "" {
+		http.Error(w, "Missing username", http.StatusBadRequest)
+		return
+	}
+
+	user, err := s.Service.GetUserByUsername(username)
 	if err != nil {
 		http.Error(w, "Failed getting user from database", http.StatusInternalServerError)
 		return
