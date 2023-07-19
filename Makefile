@@ -1,2 +1,2 @@
 inspect:
-	docker exec -it books_db_1 psql -U postgres -d books
+	docker exec -it go-book-tracker_db_1 psql -U postgres -d booktracker
