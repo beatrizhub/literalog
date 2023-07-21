@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	db, err := sql.Open("postgres", "postgres://postgres:@localhost:5432/booktracker?sslmode=disable")
+	db, err := sql.Open("postgres", "postgres://postgres:@localhost:5432/booktrackerdb?sslmode=disable")
 	if err != nil {
 		panic(err)
 	}

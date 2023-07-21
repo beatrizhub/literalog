@@ -1,0 +1,9 @@
+FROM postgres:latest
+
+EXPOSE 5432
+
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=mysecretpassword
+ENV POSTGRES_DB=booktrackerdb
+
+COPY /pkg/scripts/table.sql /docker-entrypoint-initdb.d/
