@@ -9,7 +9,7 @@ This is a simple book tracker app that allows you to add books to a list and mar
 ### Build the image
 
 ```bash
-docker build -t book-tracker .
+docker build -t book-tracker-app .
 docker build -t book-tracker-db -f Dockerfile-postgres .
 ```
 
