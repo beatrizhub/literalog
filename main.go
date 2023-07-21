@@ -1,7 +1,7 @@
 package main
 
 import (
-	"books/pkg/server"
+	"book-tracker/pkg/server"
 	"database/sql"
 	"net/http"
 

@@ -1,8 +1,8 @@
 package server
 
 import (
-	"books/pkg/books"
-	"books/pkg/user"
+	"book-tracker/pkg/book"
+	"book-tracker/pkg/user"
 	"database/sql"
 
 	"github.com/go-chi/chi"
@@ -13,7 +13,7 @@ type Server struct {
 	Db         *sql.DB
 	Router     chi.Router
 	Cache      *cache.Cache
-	BookServer *books.Server
+	BookServer *book.Server
 	UserServer *user.Server
 }
 
@@ -22,8 +22,8 @@ func NewServer(db *sql.DB) *Server {
 	r := chi.NewRouter()
 	cache := cache.New(cache.NoExpiration, cache.NoExpiration)
 
-	bookService := books.NewService(db)
-	bookServer := books.NewServer(bookService)
+	bookService := book.NewService(db)
+	bookServer := book.NewServer(bookService)
 
 	userService := user.NewService(db)
 	userServer := user.NewServer(userService)
