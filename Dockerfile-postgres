@@ -6,4 +6,4 @@ ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=mysecretpassword
 ENV POSTGRES_DB=booktrackerdb
 
-COPY /pkg/scripts/table.sql /docker-entrypoint-initdb.d/
+COPY /pkg/script/table.sql /docker-entrypoint-initdb.d/
