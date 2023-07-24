@@ -282,7 +282,7 @@ func (s *Service) GetBooksByAuthor(author string) ([]Book, error) {
 		return cachedBooks.([]Book), nil
 	}
 
-	query := "SELECT * FROM books WHERE author = $1"
+	query := "SELECT * FROM books WHERE $1 = ANY(authors)"
 
 	rows, err := s.Db.Query(query, author)
 	if err != nil {
