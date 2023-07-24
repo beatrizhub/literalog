@@ -5,8 +5,8 @@ WORKDIR /go-book-tracker
 COPY . .
 
 RUN go mod download
-RUN go build -o books
+RUN go build -o book-tracker
 
 EXPOSE 8080
 
-CMD ["./books"]
+CMD ["./book-tracker"]
