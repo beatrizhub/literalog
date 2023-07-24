@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS books (
     id SERIAL PRIMARY KEY,
     title TEXT,
     authors TEXT[],
-    genre TEXT[]
+    genre TEXT[],
+    description TEXT
 );
 
 CREATE TABLE IF NOT EXISTS users (
