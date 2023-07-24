@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS books (
     id SERIAL PRIMARY KEY,
     title TEXT,
-    author TEXT,
+    authors TEXT[],
     genre TEXT[]
 );
 

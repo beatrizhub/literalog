@@ -1,10 +1,10 @@
 package book
 
 type Book struct {
-	ID     int      `json:"id"`
-	Title  string   `json:"title"`
-	Author string   `json:"author"`
-	Genre  []string `json:"genre"`
+	ID      int      `json:"id"`
+	Title   string   `json:"title"`
+	Authors []string `json:"authors"`
+	Genre   []string `json:"genre"`
 }
 
 type ReadBook struct {

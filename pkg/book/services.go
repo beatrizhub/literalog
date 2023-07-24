@@ -30,9 +30,9 @@ func NewService(db *sql.DB) *Service {
 
 func (s *Service) CreateBook(book Book) (Book, error) {
 
-	query := "INSERT INTO books (title, author, genre) VALUES ($1, $2, $3) RETURNING id"
+	query := "INSERT INTO books (title, authors, genre) VALUES ($1, $2, $3) RETURNING id"
 
-	_, err := s.Db.Exec(query, book.Title, book.Author, pq.Array(book.Genre))
+	_, err := s.Db.Exec(query, book.Title, pq.Array(book.Authors), pq.Array(book.Genre))
 	if err != nil {
 		return Book{}, err
 	}
@@ -69,9 +69,9 @@ func (s *Service) CreateToBeReadBook(toBeReadBook ToBeReadBook) (ToBeReadBook, e
 
 func (s *Service) UpdateBook(id int, book Book) error {
 
-	query := "UPDATE books SET title = $1, author = $2, genre = $3 WHERE id = $4"
+	query := "UPDATE books SET title = $1, authors = $2, genre = $3 WHERE id = $4"
 
-	_, err := s.Db.Exec(query, book.Title, book.Author, pq.Array(book.Genre), id)
+	_, err := s.Db.Exec(query, book.Title, pq.Array(book.Authors), pq.Array(book.Genre), id)
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func (s *Service) GetBooks() ([]Book, error) {
 
 	for rows.Next() {
 		var book Book
-		err := rows.Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
+		err := rows.Scan(&book.ID, &book.Title, pq.Array(&book.Authors), pq.Array(&book.Genre))
 		if err != nil {
 			return books, err
 		}
@@ -214,7 +214,7 @@ func (s *Service) GetBookByID(id int) (Book, error) {
 	var book Book
 	query := "SELECT * FROM books WHERE id = $1"
 
-	err := s.Db.QueryRow(query, id).Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
+	err := s.Db.QueryRow(query, id).Scan(&book.ID, &book.Title, pq.Array(&book.Authors), pq.Array(&book.Genre))
 	if err != nil {
 		return Book{}, err
 	}
@@ -263,7 +263,7 @@ func (s *Service) GetBooksByGenre(genre string) ([]Book, error) {
 	var books []Book
 	for rows.Next() {
 		var book Book
-		err := rows.Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
+		err := rows.Scan(&book.ID, &book.Title, pq.Array(&book.Authors), pq.Array(&book.Genre))
 		if err != nil {
 			return nil, err
 		}
@@ -293,7 +293,7 @@ func (s *Service) GetBooksByAuthor(author string) ([]Book, error) {
 	var books []Book
 	for rows.Next() {
 		var book Book
-		err := rows.Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
+		err := rows.Scan(&book.ID, &book.Title, pq.Array(&book.Authors), pq.Array(&book.Genre))
 		if err != nil {
 			return nil, err
 		}
@@ -383,7 +383,7 @@ func (s *Service) GetBooksByTitle(title string) ([]Book, error) {
 	var books []Book
 	for rows.Next() {
 		var book Book
-		err := rows.Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
+		err := rows.Scan(&book.ID, &book.Title, pq.Array(&book.Authors), pq.Array(&book.Genre))
 		if err != nil {
 			return nil, err
 		}
@@ -412,10 +412,10 @@ func (s *Service) GetBooksRecommendations(userId int) ([]Book, error) {
 			return nil, err
 		}
 		genres = append(genres, book.Genre...)
-		authors = append(authors, book.Author)
+		authors = append(authors, book.Authors...)
 	}
 
-	query := "SELECT * FROM books WHERE genre && $1 OR author = ANY($2)"
+	query := "SELECT * FROM books WHERE genre && $1 OR authors = ANY($2)"
 
 	rows, err := s.Db.Query(query, pq.Array(genres), pq.Array(authors))
 	if err != nil {
@@ -426,7 +426,7 @@ func (s *Service) GetBooksRecommendations(userId int) ([]Book, error) {
 	var books []Book
 	for rows.Next() {
 		var book Book
-		err := rows.Scan(&book.ID, &book.Title, &book.Author, pq.Array(&book.Genre))
+		err := rows.Scan(&book.ID, &book.Title, pq.Array(&book.Authors), pq.Array(&book.Genre))
 		if err != nil {
 			return nil, err
 		}
