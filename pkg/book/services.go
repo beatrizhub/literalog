@@ -15,7 +15,7 @@ type Service struct {
 	Cache *cache.Cache
 }
 
-func NewService(db *sql.DB) *Service {
+func NewService(db *sql.DB) Handler {
 
 	cache := cache.New(cache.NoExpiration, cache.NoExpiration)
 
@@ -306,7 +306,37 @@ func (s *Service) GetBooksByAuthor(author string) ([]Book, error) {
 
 }
 
-func (s *Service) GetReadBooksByUser(id int) ([]ReadBook, error) {
+func (s *Service) GetBooksByTitle(title string) ([]Book, error) {
+
+	if cachedBooks, found := s.Cache.Get("books-title-" + title); found {
+		return cachedBooks.([]Book), nil
+	}
+
+	query := "SELECT * FROM books WHERE title = $1"
+
+	rows, err := s.Db.Query(query, title)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var books []Book
+	for rows.Next() {
+		var book Book
+		err := rows.Scan(&book.ID, &book.Title, pq.Array(&book.Authors), pq.Array(&book.Genre), &book.Description)
+		if err != nil {
+			return nil, err
+		}
+		books = append(books, book)
+	}
+
+	s.Cache.Set("books-title-"+title, books, time.Minute*5)
+
+	return books, nil
+
+}
+
+func (s *Service) GetReadBooksByUserID(id int) ([]ReadBook, error) {
 
 	if cachedReadBooks, found := s.Cache.Get("read-books-user-id-" + strconv.Itoa(id)); found {
 		return cachedReadBooks.([]ReadBook), nil
@@ -366,39 +396,9 @@ func (s *Service) GetToBeReadBooksByUserID(id int) ([]ToBeReadBook, error) {
 
 }
 
-func (s *Service) GetBooksByTitle(title string) ([]Book, error) {
-
-	if cachedBooks, found := s.Cache.Get("books-title-" + title); found {
-		return cachedBooks.([]Book), nil
-	}
-
-	query := "SELECT * FROM books WHERE title = $1"
-
-	rows, err := s.Db.Query(query, title)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var books []Book
-	for rows.Next() {
-		var book Book
-		err := rows.Scan(&book.ID, &book.Title, pq.Array(&book.Authors), pq.Array(&book.Genre), &book.Description)
-		if err != nil {
-			return nil, err
-		}
-		books = append(books, book)
-	}
-
-	s.Cache.Set("books-title-"+title, books, time.Minute*5)
-
-	return books, nil
-
-}
-
 func (s *Service) GetBooksRecommendations(userId int) ([]Book, error) {
 
-	readBooks, err := s.GetReadBooksByUser(userId)
+	readBooks, err := s.GetReadBooksByUserID(userId)
 	if err != nil {
 		return nil, err
 	}

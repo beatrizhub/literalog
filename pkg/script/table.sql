@@ -8,9 +8,9 @@ CREATE TABLE IF NOT EXISTS books (
 
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(50),
-    password VARCHAR(50),
-    email VARCHAR(100)
+    username TEXT,
+    password TEXT,
+    email TEXT
 );
 
 CREATE TABLE IF NOT EXISTS read_books (

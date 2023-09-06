@@ -9,13 +9,13 @@ import (
 )
 
 type Server struct {
-	Service *Service
+	Service Handler
 }
 
-func NewServer(service *Service) *Server {
+func NewServer(s Handler) *Server {
 
 	return &Server{
-		Service: service,
+		Service: s,
 	}
 
 }
@@ -321,7 +321,7 @@ func (s *Server) GetReadBooksByUserRoute(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	readBooks, err := s.Service.GetReadBooksByUser(userIdInt)
+	readBooks, err := s.Service.GetReadBooksByUserID(userIdInt)
 	if err != nil {
 		http.Error(w, "Failed getting read books from database", http.StatusInternalServerError)
 		return
