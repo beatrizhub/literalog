@@ -1,12 +1,13 @@
-FROM golang:1.20.5
+FROM golang:1.21
 
-WORKDIR /go-book-tracker
+WORKDIR /app
+
+COPY go.mod go.sum ./
+
+RUN go mod download
 
 COPY . .
 
-RUN go mod download
-RUN go build -o book-tracker
+RUN go build -o app
 
-EXPOSE 8080
-
-CMD ["./book-tracker"]
+CMD ["./app"]
