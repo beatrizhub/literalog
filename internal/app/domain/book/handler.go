@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/literalog/library/internal/app/domain/cerror"
+	"github.com/literalog/cerrors"
 	"github.com/literalog/library/pkg/models"
 )
 
@@ -53,7 +53,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 
 	b := models.NewBook(*req)
 	if err := h.service.Create(ctx, b); err != nil {
-		cerror.HandleError(err, w)
+		cerrors.Handle(err, w)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 
 	b := models.NewBook(*req)
 	if err := h.service.Update(ctx, b); err != nil {
-		cerror.HandleError(err, w)
+		cerrors.Handle(err, w)
 		return
 	}
 
@@ -83,7 +83,7 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	if err := h.service.Delete(ctx, id); err != nil {
-		cerror.HandleError(err, w)
+		cerrors.Handle(err, w)
 		return
 	}
 
@@ -95,7 +95,7 @@ func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	bb, err := h.service.GetAll(ctx)
 	if err != nil {
-		cerror.HandleError(err, w)
+		cerrors.Handle(err, w)
 		return
 	}
 
@@ -109,7 +109,7 @@ func (h *handler) GetById(w http.ResponseWriter, r *http.Request) {
 
 	b, err := h.service.GetById(ctx, id)
 	if err != nil {
-		cerror.HandleError(err, w)
+		cerrors.Handle(err, w)
 		return
 	}
 

@@ -3,9 +3,9 @@ package series
 import (
 	"net/http"
 
-	"github.com/literalog/library/internal/app/domain/cerror"
+	"github.com/literalog/cerrors"
 )
 
 var (
-	ErrEmptyId = cerror.New("empty id", http.StatusBadRequest)
+	ErrEmptyId = cerrors.New("empty id", http.StatusBadRequest)
 )
