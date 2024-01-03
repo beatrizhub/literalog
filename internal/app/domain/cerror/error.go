@@ -34,7 +34,7 @@ func HandleError(e error, w http.ResponseWriter) {
 	default:
 		Error{
 			Status: http.StatusInternalServerError,
-			Err:    "Internal Server Error",
+			Err:    e.Error(),
 		}.Render(w)
 	}
 }

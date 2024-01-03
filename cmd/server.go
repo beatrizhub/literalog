@@ -1,12 +1,16 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/literalog/library/internal/app/gateways/api"
+	"github.com/spf13/cobra"
+)
 
 var serverCmd = &cobra.Command{
 	Use:   "start",
-	Short: "starts literalog",
+	Short: "starts library",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return nil
+		server := api.NewServer(":8080")
+		return server.ServeHttp()
 	},
 }
 

@@ -11,7 +11,7 @@ import (
 )
 
 type MongoStorage struct {
-	client *mongo.Client
+	Client *mongo.Client
 }
 
 func NewMongoStorage() (*MongoStorage, error) {
@@ -20,7 +20,7 @@ func NewMongoStorage() (*MongoStorage, error) {
 
 	mongoUri := os.Getenv("MONGO_URI")
 	if mongoUri == "" {
-		mongoUri = "mongodb://mongo:27017"
+		mongoUri = "mongodb://localhost:27017"
 	}
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoUri))
@@ -28,7 +28,12 @@ func NewMongoStorage() (*MongoStorage, error) {
 		return nil, fmt.Errorf("failed to connect to mongo: %w", err)
 	}
 
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	return &MongoStorage{
-		client: client,
+		Client: client,
 	}, nil
 }

@@ -25,9 +25,10 @@ type handler struct {
 	router  *mux.Router
 }
 
-func NewHandler(service Service) Handler {
+func NewHandler(s Service) Handler {
 	h := &handler{
-		service: service,
+		service: s,
+		router:  mux.NewRouter(),
 	}
 
 	h.setupRoutes()
@@ -43,13 +44,13 @@ func (h *handler) setupRoutes() {
 	h.router.HandleFunc("/", h.GetAll).Methods(http.MethodGet)
 }
 
-func (h handler) Routes() *mux.Router {
+func (h *handler) Routes() *mux.Router {
 	return h.router
 }
 
 func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	req := new(models.CreateAuthorRequest)
+	req := new(models.AuthorRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
 	a := models.NewAuthor(*req)
@@ -65,7 +66,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	var req *models.CreateAuthorRequest
+	req := new(models.AuthorRequest)
 	json.NewDecoder(r.Body).Decode(&req)
 
 	a := models.NewAuthor(*req)
@@ -93,6 +94,7 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (h *handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	//TODO filter, pagination, etc
 
 	aa, err := h.service.GetAll(ctx)
 	if err != nil {

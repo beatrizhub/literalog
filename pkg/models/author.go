@@ -7,11 +7,11 @@ type Author struct {
 	Name string `json:"name"`
 }
 
-type CreateAuthorRequest struct {
+type AuthorRequest struct {
 	Name string `json:"name"`
 }
 
-func NewAuthor(req CreateAuthorRequest) *Author {
+func NewAuthor(req AuthorRequest) *Author {
 	return &Author{
 		Id:   uuid.NewString(),
 		Name: req.Name,

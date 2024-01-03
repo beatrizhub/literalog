@@ -8,21 +8,39 @@ import (
 
 type Book struct {
 	Id        string   `json:"id" bson:"_id"`
-	Title     string   `json:"title" bson:"title" validate:"required"`
-	AuthorId  string   `json:"author_id" bson:"author_id"`
-	Isbn      string   `json:"isbn" bson:"isbn"`
-	SeriesId  string   `json:"series_id" bson:"series_id"`
-	SeriesNo  int      `json:"series_no" bson:"series_no"`
-	Year      int      `json:"year" bson:"year"`
-	Publisher string   `json:"publisher" bson:"publisher"`
-	Language  string   `json:"language" bson:"language"`
-	Format    Format   `json:"format" bson:"format"`
-	PagesNo   int      `json:"pages_no" bson:"pages_no"`
-	HoursNo   int      `json:"hours_no" bson:"hours_no"`
-	Genre     []string `json:"genre" bson:"genre"`
-	Blurb     string   `json:"blurb" bson:"blurb"`
-	Cover     string   `json:"cover" bson:"cover"`
-	IsBook    bool     `json:"is_book" bson:"is_book"`
+	Title     string   `json:"title" bson:"title"`
+	AuthorId  string   `json:"author_id" bson:"author_id,omitempty"`
+	Isbn      []string `json:"isbn" bson:"isbn,omitempty"`
+	SeriesId  string   `json:"series_id" bson:"series_id,omitempty"`
+	SeriesNo  int      `json:"series_no" bson:"series_no,omitempty"`
+	Year      int      `json:"year" bson:"year,omitempty"`
+	Publisher string   `json:"publisher" bson:"publisher,omitempty"`
+	Language  string   `json:"language" bson:"language,omitempty"`
+	Format    Format   `json:"format" bson:"format,omitempty"`
+	PagesNo   int      `json:"pages_no" bson:"pages_no,omitempty"`
+	HoursNo   int      `json:"hours_no" bson:"hours_no,omitempty"`
+	Genre     []string `json:"genre" bson:"genre,omitempty"`
+	Blurb     string   `json:"blurb" bson:"blurb,omitempty"`
+	Cover     string   `json:"cover" bson:"cover,omitempty"`
+	NotABook  bool     `json:"not_a_book" bson:"not_a_book"`
+}
+
+type BookRequest struct {
+	Title     string   `json:"title" bson:"title"`
+	AuthorId  string   `json:"author_id" bson:"author_id,omitempty"`
+	Isbn      []string `json:"isbn" bson:"isbn,omitempty"`
+	SeriesId  string   `json:"series_id" bson:"series_id,omitempty"`
+	SeriesNo  int      `json:"series_no" bson:"series_no,omitempty"`
+	Year      int      `json:"year" bson:"year,omitempty"`
+	Publisher string   `json:"publisher" bson:"publisher,omitempty"`
+	Language  string   `json:"language" bson:"language,omitempty"`
+	Format    Format   `json:"format" bson:"format,omitempty"`
+	PagesNo   int      `json:"pages_no" bson:"pages_no,omitempty"`
+	HoursNo   int      `json:"hours_no" bson:"hours_no,omitempty"`
+	Genre     []string `json:"genre" bson:"genre,omitempty"`
+	Blurb     string   `json:"blurb" bson:"blurb,omitempty"`
+	Cover     string   `json:"cover" bson:"cover,omitempty"`
+	NotABook  bool     `json:"not_a_book" bson:"not_a_book"`
 }
 
 type Format string
@@ -49,23 +67,23 @@ func NewFormat(s string) Format {
 	}
 }
 
-func NewBook(b Book) *Book {
+func NewBook(req BookRequest) *Book {
 	return &Book{
 		Id:        uuid.NewString(),
-		Title:     b.Title,
-		AuthorId:  b.AuthorId,
-		Isbn:      b.Isbn,
-		SeriesId:  b.SeriesId,
-		SeriesNo:  b.SeriesNo,
-		Year:      b.Year,
-		Publisher: b.Publisher,
-		Language:  b.Language,
-		Format:    b.Format,
-		PagesNo:   b.PagesNo,
-		HoursNo:   b.HoursNo,
-		Genre:     b.Genre,
-		Blurb:     b.Blurb,
-		Cover:     b.Cover,
-		IsBook:    b.IsBook,
+		Title:     req.Title,
+		AuthorId:  req.AuthorId,
+		Isbn:      req.Isbn,
+		SeriesId:  req.SeriesId,
+		SeriesNo:  req.SeriesNo,
+		Year:      req.Year,
+		Publisher: req.Publisher,
+		Language:  req.Language,
+		Format:    req.Format,
+		PagesNo:   req.PagesNo,
+		HoursNo:   req.HoursNo,
+		Genre:     req.Genre,
+		Blurb:     req.Blurb,
+		Cover:     req.Cover,
+		NotABook:  req.NotABook,
 	}
 }

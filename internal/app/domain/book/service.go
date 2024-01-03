@@ -2,7 +2,11 @@ package book
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/literalog/library/internal/app/domain/author"
+	"github.com/literalog/library/internal/app/domain/genre"
+	"github.com/literalog/library/internal/app/domain/series"
 	"github.com/literalog/library/pkg/models"
 )
 
@@ -15,8 +19,11 @@ type Service interface {
 }
 
 type service struct {
-	repository Repository
-	validator  Validator
+	repository    Repository
+	authorService author.Service
+	seriesService series.Service
+	genreService  genre.Service
+	validator     Validator
 }
 
 func NewService(repo Repository) Service {
@@ -26,6 +33,23 @@ func NewService(repo Repository) Service {
 }
 
 func (s *service) Create(ctx context.Context, b *models.Book) error {
+	_, err := s.authorService.GetById(ctx, b.AuthorId)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.seriesService.GetById(ctx, b.SeriesId)
+	if err != nil {
+		return err
+	}
+
+	for _, genre := range b.Genre {
+		_, err = s.genreService.GetByName(ctx, genre)
+		if err != nil {
+			return fmt.Errorf("error getting genre %s: %w", genre, err)
+		}
+	}
+
 	if err := s.validator.Validate(b); err != nil {
 		return err
 	}
@@ -33,6 +57,27 @@ func (s *service) Create(ctx context.Context, b *models.Book) error {
 }
 
 func (s *service) Update(ctx context.Context, b *models.Book) error {
+	_, err := s.authorService.GetById(ctx, b.AuthorId)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.seriesService.GetById(ctx, b.SeriesId)
+	if err != nil {
+		return err
+	}
+
+	for _, genre := range b.Genre {
+		_, err = s.genreService.GetByName(ctx, genre)
+		if err != nil {
+			return fmt.Errorf("error getting genre %s: %w", genre, err)
+		}
+	}
+
+	if err := s.validator.Validate(b); err != nil {
+		return err
+	}
+
 	return s.repository.Update(ctx, b)
 }
 

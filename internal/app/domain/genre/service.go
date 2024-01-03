@@ -11,6 +11,7 @@ type Service interface {
 	Update(ctx context.Context, g *models.Genre) error
 	Delete(ctx context.Context, id string) error
 	GetById(ctx context.Context, id string) (*models.Genre, error)
+	GetByName(ctx context.Context, name string) (*models.Genre, error)
 	GetAll(ctx context.Context) ([]models.Genre, error)
 }
 
@@ -38,6 +39,10 @@ func (s *service) Delete(ctx context.Context, id string) error {
 
 func (s *service) GetById(ctx context.Context, id string) (*models.Genre, error) {
 	return s.repository.GetById(ctx, id)
+}
+
+func (s *service) GetByName(ctx context.Context, name string) (*models.Genre, error) {
+	return s.repository.GetByName(ctx, name)
 }
 
 func (s *service) GetAll(ctx context.Context) ([]models.Genre, error) {

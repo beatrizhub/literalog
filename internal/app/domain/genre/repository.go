@@ -11,5 +11,6 @@ type Repository interface {
 	Update(ctx context.Context, g *models.Genre) error
 	Delete(ctx context.Context, id string) error
 	GetById(ctx context.Context, id string) (*models.Genre, error)
+	GetByName(ctx context.Context, name string) (*models.Genre, error)
 	GetAll(ctx context.Context) ([]models.Genre, error)
 }

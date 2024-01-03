@@ -26,19 +26,26 @@ func NewServer(port string) Server {
 		router:   mux.NewRouter(),
 	}
 
-	authorRepository := mongodb.NewAuthorRepository(nil)
+	storage, err := mongodb.NewMongoStorage()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db := storage.Client.Database("library")
+
+	authorRepository := mongodb.NewAuthorRepository(db.Collection("authors"))
 	authorService := author.NewService(authorRepository)
 	authorHandler := author.NewHandler(authorService)
 
-	seriesRepository := mongodb.NewSeriesRepository(nil)
+	seriesRepository := mongodb.NewSeriesRepository(db.Collection("series"))
 	seriesService := series.NewService(seriesRepository)
 	seriesHandler := series.NewHandler(seriesService)
 
-	genreRepository := mongodb.NewGenreRepository(nil)
+	genreRepository := mongodb.NewGenreRepository(db.Collection("genre"))
 	genreService := genre.NewService(genreRepository)
 	genreHandler := genre.NewHandler(genreService)
 
-	bookRepository := mongodb.NewBookRepository(nil)
+	bookRepository := mongodb.NewBookRepository(db.Collection("books"))
 	bookService := book.NewService(bookRepository)
 	bookHandler := book.NewHandler(bookService)
 

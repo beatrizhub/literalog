@@ -7,8 +7,8 @@ import (
 var profile string
 
 var rootCmd = &cobra.Command{
-	Use:   "literalog",
-	Short: "A logbook for your literary explorations.",
+	Use:   "library",
+	Short: "literalog's management of books and related entities",
 }
 
 func init() {

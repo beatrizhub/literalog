@@ -24,9 +24,10 @@ type handler struct {
 	router  *mux.Router
 }
 
-func NewHandler(service Service) Handler {
+func NewHandler(s Service) Handler {
 	h := &handler{
-		service: service,
+		service: s,
+		router:  mux.NewRouter(),
 	}
 
 	h.setupRoutes()

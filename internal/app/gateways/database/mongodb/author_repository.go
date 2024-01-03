@@ -16,19 +16,20 @@ type AuthorRepository struct {
 }
 
 func NewAuthorRepository(collection *mongo.Collection) author.Repository {
-	return AuthorRepository{
+	return &AuthorRepository{
 		collection: collection,
 	}
 }
 
-func (r AuthorRepository) Create(ctx context.Context, a *models.Author) error {
-	if err := r.collection.FindOne(ctx, a).Decode(&a); err != nil {
+func (r *AuthorRepository) Create(ctx context.Context, a *models.Author) error {
+	_, err := r.collection.InsertOne(ctx, a)
+	if err != nil {
 		return fmt.Errorf("error creating author: %w", err)
 	}
 	return nil
 }
 
-func (r AuthorRepository) Update(ctx context.Context, a *models.Author) error {
+func (r *AuthorRepository) Update(ctx context.Context, a *models.Author) error {
 	filter := bson.M{"_id": a.Id}
 	update := bson.M{"$set": a}
 	if _, err := r.collection.UpdateOne(ctx, filter, update); err != nil {
@@ -37,7 +38,7 @@ func (r AuthorRepository) Update(ctx context.Context, a *models.Author) error {
 	return nil
 }
 
-func (r AuthorRepository) Delete(ctx context.Context, id string) error {
+func (r *AuthorRepository) Delete(ctx context.Context, id string) error {
 	filter := bson.M{"_id": id}
 	if _, err := r.collection.DeleteOne(ctx, filter); err != nil {
 		return fmt.Errorf("error deleting author: %w", err)
@@ -45,17 +46,17 @@ func (r AuthorRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r AuthorRepository) GetById(ctx context.Context, id string) (*models.Author, error) {
+func (r *AuthorRepository) GetById(ctx context.Context, id string) (*models.Author, error) {
 	filter := bson.M{"_id": id}
-	var a models.Author
-	if err := r.collection.FindOne(ctx, filter).Decode(&a); err != nil {
+	a := new(models.Author)
+	if err := r.collection.FindOne(ctx, filter).Decode(a); err != nil {
 		return nil, fmt.Errorf("error getting author: %w", err)
 	}
-	return nil, nil
+	return a, nil
 }
 
-func (r AuthorRepository) GetAll(ctx context.Context) ([]models.Author, error) {
-	var aa []models.Author
+func (r *AuthorRepository) GetAll(ctx context.Context) ([]models.Author, error) {
+	aa := make([]models.Author, 0)
 	cur, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
 		return nil, fmt.Errorf("error getting authors: %w", err)
@@ -66,5 +67,5 @@ func (r AuthorRepository) GetAll(ctx context.Context) ([]models.Author, error) {
 		return nil, fmt.Errorf("error getting authors: %w", err)
 	}
 
-	return nil, nil
+	return aa, nil
 }
